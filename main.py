@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
+import random
 import os 
 
 load_dotenv()
@@ -112,6 +113,43 @@ async def userinfo(ctx, member: discord.Member = None):
     
     # Send the embed message to the channel
     await ctx.send(embed=embed)
+
+
+wallets = {}
+
+# Command: Check Balance
+@bot.command(name='balance', help='Check your balance')
+async def check_balance(ctx):
+    member = ctx.author
+    if member.id not in wallets:
+        wallets[member.id] = 100  # Initial balance of 100 coins
+    balance = wallets[member.id]
+    await ctx.send(f'Your current balance is {balance} coins.')
+
+# Command: Coin Flip
+@bot.command(name='cf', help='Flip a coin with the specified number of coins')
+async def coin_flip(ctx, amount: int):
+    member = ctx.author
+    if member.id not in wallets:
+        wallets[member.id] = 100  # Initial balance of 100 coins
+
+    if amount <= 0:
+        await ctx.send('Please enter a valid amount of coins to flip.')
+        return
+
+    if amount > wallets[member.id]:
+        await ctx.send('You do not have enough coins.')
+        return
+
+    # Perform the coin flip
+    result = random.choice(['heads', 'tails'])
+    if result == 'heads':
+        wallets[member.id] += amount
+        await ctx.send(f'You won! Your new balance is {wallets[member.id]} coins.')
+    else:
+        wallets[member.id] -= amount
+        await ctx.send(f'You lost! Your new balance is {wallets[member.id]} coins.')
+
 
 
 BOT_TOKEN = os.getenv('TOKEN')
