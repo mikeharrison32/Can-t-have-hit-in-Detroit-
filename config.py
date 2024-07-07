@@ -1,0 +1,1 @@
+description = "A custom bot for our server"
